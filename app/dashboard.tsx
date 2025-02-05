@@ -17,6 +17,7 @@ dayjs.extend(localeData);
 dayjs.locale("ru");
 
 export default function DashboardScreen() {
+  const navigation = useNavigation();
   const [history, setHistory] = useState([]);
   const [cars, setCars] = useState([]);
   const [selectedCar, setSelectedCar] = useState<{
@@ -42,7 +43,9 @@ export default function DashboardScreen() {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
-        window.location.href = '/';
+        //@ts-ignore
+        navigation.navigate('index');
+        // window.location.href = '/';
       } else {
         getCarsList();
         getHistory();
@@ -72,7 +75,7 @@ export default function DashboardScreen() {
 
   const getHistory = async () => {
     try {
-      const response = await fetchHistory("01-01-2025", "02-02-2025");
+      const response = await fetchHistory("01-01-2025", "02-02-2029");
       const filteredHistory = response.data.filter((item:any) => item.hasOwnProperty("action"));
       //@ts-ignore
       const sortedHistory = filteredHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -154,46 +157,37 @@ export default function DashboardScreen() {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    window.location.href = '/';
+    //@ts-ignore
+    navigation.navigate('index');
+    // window.location.href = '/';
   };
-
-  // return (
-  //   <View className="flex-1 justify-center items-center p-4">
-  //     <Text className="text-2xl font-bold mb-4">Dashboard</Text>
-  //     {/* {cars.map((car:any) => (
-  //       <Text key={car.id} className="text-lg">
-  //         {car.name}
-  //       </Text>
-  //     ))} */}
-  //     <Button title="Logout" onPress={handleLogout} />
-  //   </View>
-  // );
+  
   return (
     <View className="flex-1 font-hyundai">
-      <View className="flex-row bg-blue-500 p-4 items-center">
-        <Text className="flex-1 text-3xl font-bold text-white text-center">
+      <View className="flex-row bg-blue p-4 items-center">
+        <Text className="flex-1 text-3xl font-bold text-white text-center font-hyundai">
           Moshina kirish-chiqishini qayd qilish
         </Text>
-        <TouchableOpacity onPress={handleLogout} className="border rounded-lg p-2">
-          <Text className="text-white">Chiqish</Text>
+        <TouchableOpacity onPress={handleLogout} className="border border-white rounded-lg p-2">
+          <Text className="text-white font-hyundai">Chiqish</Text>
         </TouchableOpacity>
       </View>
       <View className="flex-1 flex-col md:flex-row">
         {/* Left Side: Cars List */}
         <View className="w-full md:w-1/2 bg-gray-100 p-4">
-          <Text className="text-xl font-bold mb-4">Moshinalar ro'yhati</Text>
-          <ScrollView className="space-y-4">
+          <Text className="text-xl font-bold mb-4 font-hyundai">Moshinalar ro'yhati</Text>
+          <ScrollView>
             {cars.map((car:any) => {
               const region = car.number.slice(0, 2);
               const plate = car.number.slice(2);
               return (
                 <TouchableOpacity
                   key={car.id}
-                  className="p-4 bg-white shadow rounded-2xl flex-row justify-between items-center"
+                  className="p-4 bg-white rounded-2xl flex-row justify-between items-center mb-4"
                   onPress={() => setSelectedCar(car)}
                 >
-                  <Text className="font-medium text-xl">{car.staff_last_name} {car.staff_first_name}</Text>
-                  <View className="flex-row shadow-lg">
+                  <Text className="font-semibold text-xl font-hyundai">{car.staff_last_name} {car.staff_first_name}</Text>
+                  <View className="flex-row">
                     <Text className="rounded-lg p-1 font-mono text-xl font-bold border-2 border-black border-e-0 rounded-e-none">{region}</Text>
                     <Text className="rounded-lg p-1 font-mono text-xl font-bold border-2 border-black rounded-s-none">{plate}</Text>
                   </View>
@@ -205,37 +199,38 @@ export default function DashboardScreen() {
 
         {/* Right Side: History */}
         <View className="w-full md:w-1/2 bg-gray-200 p-4">
-          <Text className="text-xl font-bold mb-4">Kirish tarixi</Text>
-          <ScrollView className="space-y-4">
+          <Text className="text-xl font-bold mb-4 font-hyundai">Kirish tarixi</Text>
+          <ScrollView>
             {history.map((entry:any, index:number) => {
               const kirdi = 'text-green-700 ring-green-600/20 bg-green-50';
               const chiqdi = 'text-red-700 ring-red-600/10 bg-red-50';
               return (
                 <TouchableOpacity
                   key={index}
-                  className="p-4 bg-white shadow rounded flex-row justify-between items-center"
+                  className="p-4 bg-white rounded flex-row justify-between items-center mb-4"
                   onPress={() => setSelectedEntry(entry)}
                 >
                   <View>
-                    <Text className="font-medium">{entry.staff_last_name} {entry.staff_first_name}</Text>
+                    <Text className="font-medium text-lg font-hyundai">{entry.staff_last_name} {entry.staff_first_name}</Text>
                     <Text>{entry.number}</Text>
                   </View>
-                  <View className="flex-row items-center">
+                  <View className="flex-row items-start">
                     <View className="mr-2">
                       <Text
-                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset 
+                        className={`inline-flex w-fit items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset 
                           ${entry.action === 'entry' ? kirdi : chiqdi}
                         `}
                       >
                         {entry.action === 'entry' ? 'Kirdi' : 'Chiqdi'}
                       </Text>
-                      <Text className="text-sm text-gray-500 mt-2">{formatDate(entry.date)}</Text>
+                      <Text className="text-sm text-gray-500 mt-2 font-hyundai">{formatDate(entry.date)}</Text>
                     </View>
                     <TouchableOpacity
-                      onPress={() => setShowRemoveDialog(true)}
-                      className="h-fit w-fit text-red-700 border border-red-500 bg-red-50 font-medium rounded-lg text-sm px-3 py-1 text-center me-2 mb-2"
+                      onPress={() => {setShowRemoveDialog(true); setSelectedEntry(entry)}}
+                      className="h-fit w-fit border border-red-500 bg-red-50 
+                        rounded-lg px-3 py-1 me-2 mb-2"
                     >
-                      <Text className="text-red-700">x</Text>
+                      <Text className="text-red-700 text-sm font-medium text-center font-hyundai">x</Text>
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -248,9 +243,9 @@ export default function DashboardScreen() {
         {selectedEntry && !showRemoveDialog && (
           <Modal transparent={true} visible={true}>
             <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-              <View className="bg-white p-6 rounded-2xl shadow">
-                <Text className="text-2xl font-bold mb-4">O'zgartirish</Text>
-                <Text className="mb-4 text-xl">{selectedEntry.staff_last_name} {selectedEntry.staff_first_name}: {selectedEntry.number}</Text>
+              <View className="bg-white p-6 rounded-2xl">
+                <Text className="text-2xl font-bold mb-4 font-hyundai">O'zgartirish</Text>
+                <Text className="mb-4 text-xl font-hyundai">{selectedEntry.staff_last_name} {selectedEntry.staff_first_name}: {selectedEntry.number}</Text>
                 <View className="flex-row items-center space-x-4 justify-between mb-4">
                   <TouchableOpacity
                     className="flex-row items-center space-x-2"
@@ -259,31 +254,31 @@ export default function DashboardScreen() {
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
                       {selectedEntry.action === "entry" && <View className="h-3 w-3 bg-green-500 rounded-full" />}
                     </View>
-                    <Text className="text-green-600">Kirdi</Text>
+                    <Text className="text-green-600 font-hyundai">Kirdi</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="flex-row items-center space-x-2"
                     onPress={() => setSelectedEntry({ ...selectedEntry, action: "exit" })}
                   >
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
-                      {selectedEntry.action === "exit" && <View className="h-3 w-3 bg-blue-500 rounded-full" />}
+                      {selectedEntry.action === "exit" && <View className="h-3 w-3 bg-blue rounded-full" />}
                     </View>
-                    <Text className="text-red-600">Chiqdi</Text>
+                    <Text className="text-red font-hyundai">Chiqdi</Text>
                   </TouchableOpacity>
                 </View>
-                <Text className="mb-4 text-gray-500">{formatDate(selectedEntry.date)}</Text>
+                <Text className="mb-4 text-gray-500 font-hyundai">{formatDate(selectedEntry.date)}</Text>
                 <View className="flex-row justify-center space-x-4">
                   <TouchableOpacity
-                    className="px-4 py-2 bg-red-500 rounded-xl"
+                    className="px-4 py-2 bg-red rounded-xl"
                     onPress={() => setSelectedEntry(null)}
                   >
-                    <Text className="text-white">Bekor qilish</Text>
+                    <Text className="text-white font-hyundai">Bekor qilish</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className="px-4 py-2 bg-blue-500 rounded-xl"
+                    className="px-4 py-2 bg-blue rounded-xl"
                     onPress={() => editEntry(selectedEntry)}
                   >
-                    <Text className="text-white">Tasdiqlash</Text>
+                    <Text className="text-white font-hyundai">Tasdiqlash</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -295,36 +290,36 @@ export default function DashboardScreen() {
         {selectedEntry && showRemoveDialog && (
           <Modal transparent={true} visible={true}>
             <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-              <View className="bg-white p-6 rounded-2xl shadow">
-                <Text className="text-2xl font-bold mb-4">O'chirish</Text>
-                <Text className="mb-4 text-xl">{selectedEntry.staff_last_name} {selectedEntry.staff_first_name}: {selectedEntry.number}</Text>
+              <View className="bg-white p-6 rounded-2xl">
+                <Text className="text-2xl font-bold mb-4 font-hyundai">O'chirish</Text>
+                <Text className="mb-4 text-xl font-hyundai">{selectedEntry.staff_last_name} {selectedEntry.staff_first_name}: {selectedEntry.number}</Text>
                 <View className="flex-row items-center space-x-4 justify-between mb-4">
                   <View className="flex-row items-center space-x-2">
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
                       {selectedEntry.action === "entry" && <View className="h-3 w-3 bg-green-500 rounded-full" />}
                     </View>
-                    <Text className="text-green-600">Kirdi</Text>
+                    <Text className="text-green-600 font-hyundai">Kirdi</Text>
                   </View>
                   <View className="flex-row items-center space-x-2">
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
-                      {selectedEntry.action === "exit" && <View className="h-3 w-3 bg-blue-500 rounded-full" />}
+                      {selectedEntry.action === "exit" && <View className="h-3 w-3 bg-blue rounded-full" />}
                     </View>
-                    <Text className="text-red-600">Chiqdi</Text>
+                    <Text className="text-red font-hyundai">Chiqdi</Text>
                   </View>
                 </View>
-                <Text className="mb-4 text-gray-500">{formatDate(selectedEntry.date)}</Text>
+                <Text className="mb-4 text-gray-500 font-hyundai">{formatDate(selectedEntry.date)}</Text>
                 <View className="flex-row justify-center space-x-4">
                   <TouchableOpacity
-                    className="px-4 py-2 bg-red-500 rounded-xl"
+                    className="px-4 py-2 bg-red rounded-xl"
                     onPress={() => { setSelectedEntry(null); setShowRemoveDialog(false); }}
                   >
-                    <Text className="text-white">Bekor qilish</Text>
+                    <Text className="text-white font-hyundai">Bekor qilish</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className="px-4 py-2 bg-blue-500 rounded-xl"
+                    className="px-4 py-2 bg-blue rounded-xl"
                     onPress={() => deleteEntry(selectedEntry)}
                   >
-                    <Text className="text-white">O'chirish</Text>
+                    <Text className="text-white font-hyundai">O'chirish</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -336,9 +331,9 @@ export default function DashboardScreen() {
         {selectedCar && (
           <Modal transparent={true} visible={true}>
             <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-              <View className="bg-white p-6 rounded-2xl shadow">
-                <Text className="text-2xl font-bold mb-4">Tasdiqlash</Text>
-                <Text className="mb-4 text-xl">{selectedCar.staff_last_name} {selectedCar.staff_first_name}: {selectedCar.number}</Text>
+              <View className="bg-white p-6 rounded-2xl">
+                <Text className="text-2xl font-bold mb-4 font-hyundai">Tasdiqlash</Text>
+                <Text className="mb-4 text-xl font-hyundai">{selectedCar.staff_last_name} {selectedCar.staff_first_name}: {selectedCar.number}</Text>
                 <View className="flex-row items-center space-x-4 justify-between mb-4">
                   <TouchableOpacity
                     className="flex-row items-center space-x-2"
@@ -347,31 +342,31 @@ export default function DashboardScreen() {
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
                       {action === "entry" && <View className="h-3 w-3 bg-green-500 rounded-full" />}
                     </View>
-                    <Text className="text-green-600">Kirdi</Text>
+                    <Text className="text-green-600 font-hyundai">Kirdi</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="flex-row items-center space-x-2"
                     onPress={() => setAction("exit")}
                   >
                     <View className="h-5 w-5 border border-gray-400 rounded-full justify-center items-center">
-                      {action === "exit" && <View className="h-3 w-3 bg-blue-500 rounded-full" />}
+                      {action === "exit" && <View className="h-3 w-3 bg-blue rounded-full" />}
                     </View>
-                    <Text className="text-red-600">Chiqdi</Text>
+                    <Text className="text-red font-hyundai">Chiqdi</Text>
                   </TouchableOpacity>
                 </View>
-                <Text className="mb-4 text-gray-500">{formatDate(new Date(), "DD MMMM, HH:mm")}</Text>
+                <Text className="mb-4 text-gray-500 font-hyundai">{formatDate(new Date(), "DD MMMM, HH:mm")}</Text>
                 <View className="flex-row justify-center space-x-4">
                   <TouchableOpacity
-                    className="px-4 py-2 bg-red-500 rounded-xl"
+                    className="px-4 py-2 bg-red rounded-xl"
                     onPress={() => setSelectedCar(null)}
                   >
-                    <Text className="text-white">Bekor qilish</Text>
+                    <Text className="text-white font-hyundai">Bekor qilish</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className="px-4 py-2 bg-blue-500 rounded-xl"
+                    className="px-4 py-2 bg-blue rounded-xl"
                     onPress={() => createNewEntry(selectedCar)}
                   >
-                    <Text className="text-white">Tasdiqlash</Text>
+                    <Text className="text-white font-hyundai">Tasdiqlash</Text>
                   </TouchableOpacity>
                 </View>
               </View>

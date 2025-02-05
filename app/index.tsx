@@ -17,6 +17,7 @@ const LoginPage = () => {
       await AsyncStorage.setItem("token", response.data.data.access_token);
       //@ts-ignore
       navigation.navigate("dashboard");
+      // window.location.href = '/dashboard';
     } catch (err) {
       Toast.show({
         type: "error",
@@ -28,13 +29,13 @@ const LoginPage = () => {
 
   return (
     <View className="flex-1 items-center justify-center bg-[#002A50] px-4">
-      <View className="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
-        <Text className="mb-6 text-2xl font-bold text-center text-[#002A50]">
+      <View className="w-full max-w-md p-6 bg-white rounded-lg">
+        <Text className="mb-6 text-2xl font-bold text-center text-[#002A50] font-hyundai">
           Login
         </Text>
         <View className="space-y-4">
           <View>
-            <Text className="text-sm font-medium text-gray-700">Login</Text>
+            <Text className="text-sm font-medium text-gray-700 font-hyundai">Login</Text>
             <TextInput
               className="w-full px-3 py-2 mt-1 border rounded-md focus:border-[#002A50]"
               placeholder="Login kiriting"
@@ -43,7 +44,7 @@ const LoginPage = () => {
             />
           </View>
           <View>
-            <Text className="text-sm font-medium text-gray-700">Password</Text>
+            <Text className="text-sm font-medium text-gray-700 font-hyundai">Password</Text>
             <TextInput
               className="w-full px-3 py-2 mt-1 border rounded-md focus:border-[#002A50]"
               placeholder="Parol kiriting"
@@ -56,7 +57,7 @@ const LoginPage = () => {
             onPress={handleLogin}
             className="w-full px-4 py-2 mt-6 text-white bg-[#002A50] rounded-md items-center"
           >
-            <Text className="text-white text-lg">Kirish</Text>
+            <Text className="text-white text-lg font-hyundai">Kirish</Text>
           </TouchableOpacity>
         </View>
       </View>

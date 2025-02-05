@@ -4,7 +4,19 @@ module.exports = {
   content: ["./app/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        blue: {
+          DEFAULT: '#002A50'
+        },
+        red: {
+          DEFAULT: '#e31e24'
+        }
+      },
+      fontFamily: {
+        hyundai: ['HyundaiSans', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }
